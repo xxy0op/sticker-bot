@@ -31,7 +31,31 @@ docker run -d --name sticker-bot --restart unless-stopped \
   ghcr.io/xxy0op/sticker-bot:latest
 ```
 
-或者用 compose（先把下面的 compose 文件和 .env 放到服务器上）：
+或者用 compose 单文件部署（不用克隆仓库，不用 .env）：
+
+把下面这个模板存成 `docker-compose.yml`，把 `TELEGRAM_BOT_TOKEN` 改成你的 token：
+
+```yaml
+services:
+  sticker-bot:
+    image: ghcr.io/xxy0op/sticker-bot:latest
+    container_name: sticker-bot
+    restart: unless-stopped
+    environment:
+      TELEGRAM_BOT_TOKEN: "你的token"
+```
+
+然后启动：
+
+```bash
+docker compose up -d
+```
+
+注意：这个文件里写了你的 token，只放服务器上，不要分享、不要提交到仓库。
+（这个模板也在仓库里，叫 `docker-compose.standalone.yml`，也可以直接拉取：
+`curl -O https://raw.githubusercontent.com/xxy0op/sticker-bot/main/docker-compose.standalone.yml`）
+
+也可以克隆仓库后用自带的 compose 文件（配合 .env）：
 
 ```bash
 git clone https://github.com/xxy0op/sticker-bot.git
