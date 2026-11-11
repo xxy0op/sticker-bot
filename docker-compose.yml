@@ -1,0 +1,8 @@
+services:
+  sticker-bot:
+    build: .
+    image: sticker-bot
+    container_name: sticker-bot
+    restart: unless-stopped
+    env_file:
+      - .env

@@ -1,0 +1,15 @@
+[Unit]
+Description=Telegram sticker download bot
+After=network-online.target
+
+[Service]
+Type=simple
+User=root
+WorkingDirectory=/root/sticker-bot
+Environment=TELEGRAM_BOT_TOKEN=你的token
+ExecStart=/root/sticker-bot/.venv/bin/python /root/sticker-bot/bot.py
+Restart=always
+RestartSec=5
+
+[Install]
+WantedBy=multi-user.target

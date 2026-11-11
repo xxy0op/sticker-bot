@@ -1,0 +1,4 @@
+python-telegram-bot>=21,<23
+Pillow>=10
+lottie>=0.7
+cairosvg>=2.7
