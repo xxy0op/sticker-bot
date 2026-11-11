@@ -1,7 +1,0 @@
-services:
-  sticker-bot:
-    image: ghcr.io/xxy0op/sticker-bot:latest
-    container_name: sticker-bot
-    restart: unless-stopped
-    env_file:
-      - .env
