@@ -1,0 +1,15 @@
+# TG 表情下载机器人：单文件部署模板
+# 不用克隆仓库，不用 .env 文件，一个文件就能部署。
+# 用法：
+#   1. 把下面 TELEGRAM_BOT_TOKEN 的值改成你的 token
+#   2. docker compose -f docker-compose.standalone.yml up -d
+# 注意：这个文件里写了你的 token，只放服务器上，不要分享、不要提交到仓库。
+services:
+  sticker-bot:
+    image: ghcr.io/xxy0op/sticker-bot:latest
+    container_name: sticker-bot
+    restart: unless-stopped
+    environment:
+      TELEGRAM_BOT_TOKEN: "你的token"
+      # 只允许自己的 Telegram 用户 ID 使用(逗号分隔)，不需要就删掉这行
+      # ALLOWED_USER_IDS: "123456789"

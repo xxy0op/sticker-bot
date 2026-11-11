@@ -117,6 +117,23 @@ systemctl enable --now stickerbot
 systemctl status stickerbot
 ```
 
+## 只允许自己使用（可选）
+
+默认谁都能用。只想自己用，设置环境变量 `ALLOWED_USER_IDS` 为你的 Telegram 用户 ID
+（多个用逗号分隔）：
+
+```bash
+ALLOWED_USER_IDS=123456789
+```
+
+查自己的 ID：给 [@userinfobot](https://t.me/userinfobot) 发任意消息，它会回复你的 ID；
+或者看机器人日志里 `sticker from chat` 后面的数字（私聊时 chat id 就是你的用户 ID）。
+不在白名单里的人发消息，机器人会回“这个机器人是私用的，不对外开放。”
+
+Docker 部署时同样加环境变量：`docker run` 加 `-e ALLOWED_USER_IDS=123456789`，
+compose 在 `environment:` 里加一行 `ALLOWED_USER_IDS: "123456789"`，
+systemd 在 `stickerbot.service` 里加一行 `Environment=ALLOWED_USER_IDS=123456789`。
+
 ## 使用
 
 1. 在 Telegram 里打开机器人，`/start`

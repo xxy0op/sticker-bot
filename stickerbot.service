@@ -7,6 +7,8 @@ Type=simple
 User=root
 WorkingDirectory=/root/sticker-bot
 Environment=TELEGRAM_BOT_TOKEN=你的token
+# 只允许自己的 Telegram 用户 ID 使用(逗号分隔)，不需要就删掉这行
+# Environment=ALLOWED_USER_IDS=123456789
 ExecStart=/root/sticker-bot/.venv/bin/python /root/sticker-bot/bot.py
 Restart=always
 RestartSec=5

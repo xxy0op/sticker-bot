@@ -38,6 +38,13 @@ from telegram.ext import (
 TOKEN = os.environ.get("TELEGRAM_BOT_TOKEN", "")
 BASE_DIR = Path(os.environ.get("STICKER_BOT_DATA", "/tmp/sticker-bot"))
 
+# 只允许这些 Telegram 用户 ID 使用机器人(逗号分隔), 为空表示不限制。
+# 查自己的 ID: 给 @userinfobot 发任意消息, 或看机器人日志里 "sticker from chat" 后面的数字
+# (私聊时 chat id 就是你的用户 ID)。
+ALLOWED_USER_IDS = {
+    int(x) for x in os.environ.get("ALLOWED_USER_IDS", "").split(",") if x.strip()
+}
+
 logging.basicConfig(
     level=logging.INFO,
     format="%(asctime)s %(levelname)s %(name)s: %(message)s",
@@ -100,7 +107,20 @@ def convert_video_to_gif(path: Path, fps: int = GIF_FPS, width: int = GIF_WIDTH)
 
 # ---------- 处理流程 ----------
 
+def is_allowed(update: Update) -> bool:
+    """白名单检查: ALLOWED_USER_IDS 为空表示不限制, 否则只放行名单里的用户。"""
+    if not ALLOWED_USER_IDS:
+        return True
+    user = update.effective_user
+    return user is not None and user.id in ALLOWED_USER_IDS
+
+
 async def start(update: Update, context: ContextTypes.DEFAULT_TYPE):
+    if not is_allowed(update):
+        user = update.effective_user
+        logger.info("denied user %s", user.id if user else None)
+        await update.message.reply_text("这个机器人是私用的，不对外开放。")
+        return
     await update.message.reply_text(
         "发我一个表情, 我直接把文件发回来。\n\n"
         "静态表情 → PNG(微信可用)\n"
@@ -113,6 +133,11 @@ async def start(update: Update, context: ContextTypes.DEFAULT_TYPE):
 async def on_message(update: Update, context: ContextTypes.DEFAULT_TYPE):
     msg = update.message
     if msg is None:
+        return
+    if not is_allowed(update):
+        user = update.effective_user
+        logger.info("denied user %s", user.id if user else None)
+        await msg.reply_text("这个机器人是私用的，不对外开放。")
         return
     item = None
     if msg.sticker:
