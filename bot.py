@@ -17,6 +17,7 @@
 依赖: python-telegram-bot>=21, Pillow, lottie, cairosvg
 系统依赖: ffmpeg(视频转 GIF), libcairo2(lottie 渲染, 多数系统自带)
 """
+import asyncio
 import contextlib
 import io
 import logging
@@ -168,12 +169,14 @@ async def on_message(update: Update, context: ContextTypes.DEFAULT_TYPE):
         src = workdir / f"sticker{ext}"
         await f.download_to_drive(src)
 
+        # 转换是同步的 CPU 密集操作, 直接调会堵住事件循环(这期间收不到新消息),
+        # 放线程里跑, 事件循环继续收发消息; 配合 concurrent_updates 实现多张并行转
         if kind == "static":
-            out = convert_webp_to_png(src)
+            out = await asyncio.to_thread(convert_webp_to_png, src)
         elif kind == "animated":
-            out = convert_tgs_to_gif(src)
+            out = await asyncio.to_thread(convert_tgs_to_gif, src)
         elif kind == "video":
-            out = convert_video_to_gif(src)
+            out = await asyncio.to_thread(convert_video_to_gif, src)
         else:  # gif 原文件
             out = src
 
@@ -213,6 +216,9 @@ def main():
         .read_timeout(30)
         .write_timeout(30)
         .pool_timeout(10)
+        # 默认一次只处理一条消息, 发多张表情要排队等前一张转完;
+        # 允许最多 4 条并行处理(配合 to_thread), 服务器 4 核刚好够用
+        .concurrent_updates(4)
         .build()
     )
     app.add_handler(CommandHandler("start", start))
