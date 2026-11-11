@@ -19,19 +19,11 @@
 
 ## 部署
 
-### Docker 部署（推荐：直接拉镜像）
+### Docker 部署（compose，推荐）
 
 镜像由 GitHub Actions 自动构建并发布到 GitHub Container Registry
 （`ghcr.io/xxy0op/sticker-bot:latest`），更新代码后会自动重新构建。
-不用克隆仓库，一条命令就能跑：
-
-```bash
-docker run -d --name sticker-bot --restart unless-stopped \
-  -e TELEGRAM_BOT_TOKEN="你的token" \
-  ghcr.io/xxy0op/sticker-bot:latest
-```
-
-或者用 compose 单文件部署（不用克隆仓库，不用 .env）：
+不用克隆仓库，一个 compose 文件就能部署：
 
 把下面这个模板存成 `docker-compose.yml`，把 `TELEGRAM_BOT_TOKEN` 改成你的 token：
 
@@ -55,29 +47,12 @@ docker compose up -d
 （这个模板也在仓库里，叫 `docker-compose.standalone.yml`，也可以直接拉取：
 `curl -O https://raw.githubusercontent.com/xxy0op/sticker-bot/main/docker-compose.standalone.yml`）
 
-也可以克隆仓库后用自带的 compose 文件（配合 .env）：
-
-```bash
-git clone https://github.com/xxy0op/sticker-bot.git
-cd sticker-bot
-cp .env.example .env   # 把 TELEGRAM_BOT_TOKEN 改成你的 token
-docker compose up -d
-```
-
 更新、看日志、停掉：
 
 ```bash
 docker compose pull && docker compose up -d
 docker logs -f sticker-bot
 docker compose down
-```
-
-不想拉镜像、想自己构建也行：
-
-```bash
-docker build -t sticker-bot .
-docker run -d --name sticker-bot --restart unless-stopped \
-  -e TELEGRAM_BOT_TOKEN="你的token" sticker-bot
 ```
 
 ### 直接部署（不用 Docker）
