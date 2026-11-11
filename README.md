@@ -19,37 +19,36 @@
 
 ## 部署
 
-### Docker 部署（推荐）
+### Docker 部署（推荐：直接拉镜像）
 
-1. 克隆仓库：
+镜像由 GitHub Actions 自动构建并发布到 GitHub Container Registry
+（`ghcr.io/xxy0op/sticker-bot:latest`），更新代码后会自动重新构建。
+不用克隆仓库，一条命令就能跑：
+
+```bash
+docker run -d --name sticker-bot --restart unless-stopped \
+  -e TELEGRAM_BOT_TOKEN="你的token" \
+  ghcr.io/xxy0op/sticker-bot:latest
+```
+
+或者用 compose（先把下面的 compose 文件和 .env 放到服务器上）：
 
 ```bash
 git clone https://github.com/xxy0op/sticker-bot.git
 cd sticker-bot
+cp .env.example .env   # 把 TELEGRAM_BOT_TOKEN 改成你的 token
+docker compose up -d
 ```
 
-2. 填 token（只放 .env 里，不进镜像、不进仓库）：
+更新、看日志、停掉：
 
 ```bash
-cp .env.example .env
-# 把 TELEGRAM_BOT_TOKEN 改成你的 token
-```
-
-3. 构建并启动：
-
-```bash
-docker compose up -d --build
-```
-
-4. 看日志、停掉、更新：
-
-```bash
+docker compose pull && docker compose up -d
 docker logs -f sticker-bot
 docker compose down
-git pull && docker compose up -d --build
 ```
 
-也可以不用 compose，直接跑镜像：
+不想拉镜像、想自己构建也行：
 
 ```bash
 docker build -t sticker-bot .
